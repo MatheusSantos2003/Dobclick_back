@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "ts-node src/app.ts",
     "build": "tsc",
-    "start": "node dist/app.js"
+    "start": "yarn build && node dist/app.js"
   },
   "dependencies": {
     "@types/node": "^17.0.21",

@@ -1,32 +1,36 @@
+import { AppDataSource } from "./datasource";
 import express from "express";
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import "reflect-metadata";
-const cors = require('cors');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
+const cors = require("cors");
+const logger = require("morgan");
+const cookieParser = require("cookie-parser");
 
-require('dotenv').config();
+const UsuarioRoute = require("./routes/Usuario");
 
-// create and setup express app
-const app = express();
-app.use(express.json());
-app.use(cors());
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+require("dotenv").config();
 
+AppDataSource.initialize().then(async () => {
+  const app = express();
+  app.use(express.json());
+  app.use(cors());
+  app.use(logger("dev"));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(cookieParser());
 
+  //rotas
+  app.use("/usuarios", UsuarioRoute);
 
-
-
-app.get('/', (req: Request,res : Response)=>{
+  app.get("/", (req: Request, res: Response) => {
     res.status(200).send("Olá Mundo!!!");
-});
+  });
 
-
-const port = process.env.PORT || 3000;
-// start express server
-app.listen(port,  ()=>{
+  const port = process.env.PORT || 3000;
+  // start express server
+  app.listen(port, () => {
     console.log(`Servidor Rodando na porta ${port}!`);
-});
+  });
+}).catch(error => console.log(error))
+
+
