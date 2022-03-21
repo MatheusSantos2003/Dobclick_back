@@ -6,8 +6,13 @@ export class UsuarioEntity {
     @PrimaryGeneratedColumn()
     Id?:number;
 
-    @Column()
-    name?: string;
+    @Column({nullable:false})
+    nome?: string;
 
+    @Column({nullable:false})
+    email?: string;
+
+    @Column({nullable:false})
+    senha?: string;
 
 }

@@ -6,7 +6,7 @@ const cors = require("cors");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 
-const UsuarioRoute = require("./routes/Usuario");
+const UsuarioRoute = require("./routes/UsuariosRoutes/Usuario");
 
 require("dotenv").config();
 
@@ -31,6 +31,6 @@ AppDataSource.initialize().then(async () => {
   app.listen(port, () => {
     console.log(`Servidor Rodando na porta ${port}!`);
   });
-}).catch(error => console.log(error))
+}).catch((error: any) => console.log(error))
 
 
