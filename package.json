@@ -11,6 +11,7 @@
     "start": "yarn build && node dist/app.js"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^17.0.21",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
