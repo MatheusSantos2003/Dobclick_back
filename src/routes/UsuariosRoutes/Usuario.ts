@@ -15,14 +15,15 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.post('/cadastrar',async (req:Request,res:Response)=>{
    const usuarioAdd =  new UsuarioEntity();
+   let retorno: ResponseModel = new ResponseModel;
 
    const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity,{where:{email:req.body.email}});
 
   if(UsuarioFind?.Id){
-    var resposta = new ResponseModel();
-    resposta.message = "Email Já Cadastrado!";
-    resposta.success = false;
-    res.status(500).send(resposta);
+   
+    retorno.message = "Email Já Cadastrado!";
+    retorno.success = false;
+    res.status(500).send(retorno);
     return;
   }
 
@@ -32,7 +33,24 @@ router.post('/cadastrar',async (req:Request,res:Response)=>{
 
    const response = await AppDataSource.manager.save(usuarioAdd);
 
-   res.status(200).send(response);
+   
+   //sucesso
+   if(response){
+    
+    retorno.success = true;
+    retorno.data = response;
+
+    res.status(200).send(retorno);
+
+   }else{
+  
+    retorno.success = false;
+    retorno.data = null;
+    retorno.message = "Não foi Possivel Adicionar o usuario!";
+
+    res.status(500).send(retorno);
+
+   }
 });
 
 router.post('/login',async (req:Request,res:Response)=>{
