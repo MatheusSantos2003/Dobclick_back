@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { UsuarioEntity } from "./entity/Usuario";
+
 
 require("dotenv").config();
 
@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE_SCHEMANAME || "dobclick",
   synchronize: true,
   logging: false,
-  entities: [UsuarioEntity],
+  entities: ["src/entity/*.ts"],
   migrations: ["src/migration/**/*.ts"],
   subscribers: ["src/subscriber/**/*.ts"],
 });

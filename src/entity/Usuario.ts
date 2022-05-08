@@ -15,7 +15,7 @@ export class UsuarioEntity {
     @Column({ nullable: false })
     senha?: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     foto?: string;
 
 }

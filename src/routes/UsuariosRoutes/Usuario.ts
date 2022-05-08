@@ -19,7 +19,7 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
   const usuarioAdd = new UsuarioEntity();
   let retorno: ResponseModel = new ResponseModel;
 
-  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: req.body.email } });
+  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: req.body.data.email } });
 
   if (UsuarioFind?.Id) {
 
@@ -29,9 +29,9 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
     return;
   }
 
-  usuarioAdd.nome = req.body.nome;
-  usuarioAdd.email = req.body.email;
-  usuarioAdd.senha = req.body.senha;
+  usuarioAdd.nome = req.body.data.nome;
+  usuarioAdd.email = req.body.data.email;
+  usuarioAdd.senha = req.body.data.senha;
 
   const response = await AppDataSource.manager.save(usuarioAdd);
 
@@ -57,7 +57,7 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
 
 router.post('/login', async (req: Request, res: Response) => {
   var response = new ResponseModel();
-  const { email, senha } = req.body;
+  const { email, senha } = req.body.data;
 
   const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email, senha: senha } });
 
