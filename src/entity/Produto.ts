@@ -17,7 +17,10 @@ export class ProdutoEntity {
     tamanho?: string;
 
     @Column({ nullable: false})
-    genero?: number;
+    genero?: string;
+
+    @Column({nullable :false, default:"Sem Marca" })
+    marca?: string;
 
     @Column({nullable: false})
     cor?: string;
@@ -25,14 +28,8 @@ export class ProdutoEntity {
     @Column(({nullable:false,default: 0}))
     estoque?: number;
 
-
-    // "codigo": values.codigo,
-    // //   "descricao": values.descricao,
-    // //   "tamanho": values.tamanho,
-    // //   "genero": values.genero,
-    // //   "cor": values.cor,
-    // //   "estoque": values.estoque
-
+    @Column(({nullable:false, default: 0}))
+    fornecedorId?: number;
 
 
     // marcaId
