@@ -106,7 +106,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
   } else {
     response.success = false;
-    response.message = "Usuário não econtrado!!";
+    response.message = "Usuário ou Senha Inválidos";
     response.data = null;
     res.status(200).send(response);
 
