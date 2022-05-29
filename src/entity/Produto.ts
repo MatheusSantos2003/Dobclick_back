@@ -33,7 +33,7 @@ export class ProdutoEntity {
     fornecedorId?: number;
 
     @ManyToOne(() => UsuarioEntity,(usuario)=> usuario.Id)
-    usuario!: UsuarioEntity;
+    usuario!: UsuarioEntity | null;
 
     // marcaId
 
