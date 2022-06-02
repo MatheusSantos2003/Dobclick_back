@@ -12,8 +12,8 @@ const express = require("express");
 const router = express.Router();
 
 
-router.get("/:userId", async (req: Request, res: Response) => {
-  const userId = Number(req.params.userId);
+router.post("/listar", async (req: Request, res: Response) => {
+  const userId = Number(req.body.id);
   var response = new ResponseModel();
 
   if(isNaN(userId)){
@@ -125,9 +125,12 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
   let retorno: ResponseModel = new ResponseModel;
 
   //procura se produto com código igual existe
-  let produto = await AppDataSource.manager.findOne(ProdutoEntity, { where: { codigo: req.body.data.codigo } });
   let usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: req.body.data.usuarioId } })
+  let produto = await AppDataSource.getRepository(ProdutoEntity).createQueryBuilder().select("*").from(ProdutoEntity,"produto")
+  .where("produto.codigo = :cod",{cod: req.body.data.codigousuario}).andWhere("produto.usuarioId = :id",{id: usuario?.Id}).execute();
 
+  console.log(produto);
+  //req.body.data.codigousuario
   if (produto?.Id) {
 
     retorno.message = "Código de produto já Cadastrado!!!";
