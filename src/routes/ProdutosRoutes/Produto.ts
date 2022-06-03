@@ -126,11 +126,12 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
 
   //procura se produto com código igual existe
   let usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: req.body.data.usuarioId } })
-  let produto = await AppDataSource.getRepository(ProdutoEntity).createQueryBuilder().select("*").from(ProdutoEntity,"produto")
-  .where("produto.codigo = :cod",{cod: req.body.data.codigousuario}).andWhere("produto.usuarioId = :id",{id: usuario?.Id}).execute();
+  let produto: ProdutoEntity | null = await AppDataSource.createQueryBuilder().select("produto").from(ProdutoEntity,"produto")
+  .where("produto.codigo = :cod",{cod: req.body.data.codigo}).andWhere("produto.usuarioId = :id",{id: usuario?.Id}).getOne();
 
-  console.log(produto);
-  //req.body.data.codigousuario
+
+  
+  // //req.body.data.codigousuario
   if (produto?.Id) {
 
     retorno.message = "Código de produto já Cadastrado!!!";
