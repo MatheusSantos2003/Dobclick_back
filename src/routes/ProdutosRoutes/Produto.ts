@@ -15,7 +15,7 @@ const router = express.Router();
 router.post("/listar", async (req: Request, res: Response) => {
   const userId = Number(req.body.id);
   var response = new ResponseModel();
-
+console.log("usuarioId:" + userId);
   if(isNaN(userId)){
     response.success = false;
     response.message = "Erro: Usuário Inválido! " ;
@@ -88,6 +88,7 @@ router.put("/editar", async (req: Request, res: Response) => {
     ProdutoEdit.marca = req.body.data.marca;
     ProdutoEdit.cor = req.body.data.cor;
     ProdutoEdit.estoque = req.body.data.estoque;
+    ProdutoEdit.preco = req.body.data.preco;
     ProdutoEdit.fornecedorId = Number(req.body.data.fornecedorId);
 
 
@@ -150,6 +151,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     ProdutoAdd.cor = req.body.data.cor;
     ProdutoAdd.estoque = req.body.data.estoque;
     ProdutoAdd.fornecedorId = req.body.data.fornecedorId;
+    ProdutoAdd.preco = req.body.data.preco;
     ProdutoAdd.usuario = usuario;
       
         const response = await AppDataSource.manager.save(ProdutoAdd);

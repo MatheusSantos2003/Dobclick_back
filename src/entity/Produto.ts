@@ -29,15 +29,20 @@ export class ProdutoEntity {
     @Column(({nullable:false,default: 0}))
     estoque?: number;
 
+    @Column(({nullable:false,default:0.0,type:"float"}))
+    preco?: number;
+    
     @Column(({nullable:false, default: 0}))
     fornecedorId?: number;
 
     @ManyToOne(() => UsuarioEntity,(usuario)=> usuario.Id)
     usuario!: UsuarioEntity | null;
 
+
+
     // marcaId
 
-    // usuarioId
+
 
     // categoriaId
 
