@@ -96,48 +96,38 @@ router.post('/login', async (req: Request, res: Response) => {
   const { email, senha } = req.body;
 
 
-  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email} });
+  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email } });
 
   if (UsuarioFind?.Id) {
 
-    bcrypt.compareSync(senha, UsuarioFind.senha, async (err:any,result:any)=>{
-
-      if(err){
-        console.log(err);
+    // bcrypt.compareSync(senha, UsuarioFind.senha, async (err:any,result:any)=>{
+    bcrypt.compare(senha, UsuarioFind.senha).then(function (result: boolean) {
+    
+      if(result){
+        var payload = {
+          Id: UsuarioFind.Id,
+          nome: UsuarioFind.nome,
+          email: UsuarioFind.email
+        }
+    
+        var token = jwt.sign(payload, process.env.SECRETKEY)
+    
+        response.success = true;
+        response.data = token;
+        res.status(200).send(response);
+        //faz login
+      }else{
         response.success = false;
-        response.message = "Houve um Erro Ao Fazer Login";
+        response.message = "Usuário ou Senha Inválidos";
         response.data = null;
         res.status(200).send(response);
-        return;
+    
       }
-
-      if(!result){
-        console.log(err);
-        response.success = false;
-        response.message = "Houve um Erro Ao Fazer Login";
-        response.data = null;
-        res.status(200).send(response);
-        return;
-      }
-
-      var payload = {
-        Id: UsuarioFind.Id,
-        nome: UsuarioFind.nome,
-        email: UsuarioFind.email
-      }
-  
-      var token = jwt.sign(payload, process.env.SECRETKEY)
-  
-      response.success = true;
-      response.data = token;
-      res.status(200).send(response);
-      //faz login
 
     });
 
 
    
-
   } else {
     response.success = false;
     response.message = "Usuário ou Senha Inválidos";
