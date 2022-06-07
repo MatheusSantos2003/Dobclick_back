@@ -4,8 +4,10 @@ import { AppDataSource } from "../../datasource";
 
 import { UsuarioEntity } from "../../entity/Usuario";
 import { ResponseModel } from "../../models/Response.model";
+import { SelectQueryBuilder } from "typeorm";
 
 const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 const express = require("express");
 const router = express.Router();
@@ -47,7 +49,14 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
 
   usuarioAdd.nome = req.body.nome;
   usuarioAdd.email = req.body.email;
-  usuarioAdd.senha = req.body.senha;
+
+  var senhaSemHash = req.body.senha;
+
+
+  const hash = bcrypt.hashSync(senhaSemHash, 10);
+
+  usuarioAdd.senha = hash;
+
 
   const response = await AppDataSource.manager.save(usuarioAdd);
 
@@ -87,22 +96,47 @@ router.post('/login', async (req: Request, res: Response) => {
   const { email, senha } = req.body;
 
 
-  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email, senha: senha } });
+  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email} });
 
   if (UsuarioFind?.Id) {
 
-    var payload = {
-      Id: UsuarioFind.Id,
-      nome: UsuarioFind.nome,
-      email: UsuarioFind.email
-    }
+    bcrypt.compareSync(senha, UsuarioFind.senha, async (err:any,result:any)=>{
 
-    var token = jwt.sign(payload, process.env.SECRETKEY)
+      if(err){
+        console.log(err);
+        response.success = false;
+        response.message = "Houve um Erro Ao Fazer Login";
+        response.data = null;
+        res.status(200).send(response);
+        return;
+      }
 
-    response.success = true;
-    response.data = token;
-    res.status(200).send(response);
-    //faz login
+      if(!result){
+        console.log(err);
+        response.success = false;
+        response.message = "Houve um Erro Ao Fazer Login";
+        response.data = null;
+        res.status(200).send(response);
+        return;
+      }
+
+      var payload = {
+        Id: UsuarioFind.Id,
+        nome: UsuarioFind.nome,
+        email: UsuarioFind.email
+      }
+  
+      var token = jwt.sign(payload, process.env.SECRETKEY)
+  
+      response.success = true;
+      response.data = token;
+      res.status(200).send(response);
+      //faz login
+
+    });
+
+
+   
 
   } else {
     response.success = false;
