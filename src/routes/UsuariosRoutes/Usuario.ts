@@ -17,21 +17,21 @@ router.get("/", async (req: Request, res: Response) => {
   res.status(200).send(usuariosResponse);
 });
 
-function verifyToken(req: any, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return res.status(401).send("Unauthorized request");
-  }
-  let token = req.headers.authorization.split(' ')[1];
-  if (token === 'null') {
-    return res.status(401).send("Unauthorized request");
-  }
-  let payload = jwt.verify(token, 'secretKey');
-  if (!payload) {
-    return res.status(401).send("Unauthorized request");
-  }
-  req.userId = payload.subject;
-  next();
-}
+// function verifyToken(req: any, res: Response, next: NextFunction) {
+//   if (!req.headers.authorization) {
+//     return res.status(401).send("Unauthorized request");
+//   }
+//   let token = req.headers.authorization.split(' ')[1];
+//   if (token === 'null') {
+//     return res.status(401).send("Unauthorized request");
+//   }
+//   let payload = jwt.verify(token, 'secretKey');
+//   if (!payload) {
+//     return res.status(401).send("Unauthorized request");
+//   }
+//   req.userId = payload.subject;
+//   next();
+// }
 
 router.post('/cadastrar', async (req: Request, res: Response) => {
   const usuarioAdd = new UsuarioEntity();
