@@ -6,7 +6,7 @@
   "author": "Matheus Santos <mt.pesc@hotmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/app.ts",
+    "dev": " nodemon src/app.ts",
     "build": "tsc",
     "start": "yarn build && node dist/app.js"
   },
@@ -20,7 +20,9 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.3",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.16",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.5.0",

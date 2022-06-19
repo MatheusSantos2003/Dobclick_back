@@ -1,16 +1,17 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-
+import { ProdutoEntity } from "./Produto";
 import { UsuarioEntity } from "./Usuario";
 
 
-@Entity({ name: "Venda" })
-export class VendaEntity {
+
+@Entity({ name: "Compra" })
+export class CompraEntity {
 
     @PrimaryGeneratedColumn()
     Id?: number;
 
     @Column({ nullable: false })
-    datavenda?: Date;
+    dataCompra?: Date;
 
     @Column({ nullable: false })
     pagamentoEfetuado?: boolean;
@@ -21,27 +22,23 @@ export class VendaEntity {
     @Column({ nullable: false })
     valorTotal?: number;
 
-    @Column({ nullable: true })
-    valorTotalDisplay?: string;
+    @Column({ nullable: false })
+    valorCompra?: number;
 
-    @Column({nullable:false})
-    cliente?: string;
+    @Column({ nullable: false })
+    fornecedor?: string;
 
-    @Column({nullable:false})
-    clienteContato?: string;
+    @Column({ nullable: false })
+    fornecedorContato?: string;
 
-    @Column({nullable:false})
-    produtoDisplay?:string;
+    @Column({ nullable: false })
+    quantidade?: number;
 
-    @Column({nullable:false})
-    quantidadeDisplay?:string;
+    @ManyToOne(() => ProdutoEntity, (produto) => produto.Id)
+    produto!: ProdutoEntity
 
-    @Column({nullable:false})
-    dataVendaDisplay?:string;
-
-
+    
     @ManyToOne(() => UsuarioEntity, (usuario) => usuario.Id)
     usuario!: UsuarioEntity;
-
 
 }

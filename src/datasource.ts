@@ -12,11 +12,11 @@ require("dotenv").config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host:  process.env.DATABASE_URL || "localhost",
+  host:  "localhost" || process.env.DATABASE_URL,
   port: 5432,
-  username: process.env.DATABASE_USER || "postgres",
-  password: process.env.DATABASE_PWD || "root",
-  database: process.env.DATABASE_SCHEMANAME || "dobclick",
+  username:  "postgres" || process.env.DATABASE_USER ,
+  password:  "root" || process.env.DATABASE_PWD ,
+  database: "dobclick" || process.env.DATABASE_SCHEMANAME ,
   synchronize: true,
   logging: false,
   entities: ["src/entity/**/*.ts"],

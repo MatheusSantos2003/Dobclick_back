@@ -8,6 +8,9 @@ const cookieParser = require("cookie-parser");
 
 const UsuarioRoute = require("./routes/UsuariosRoutes/Usuario");
 const ProdutoRoute = require("./routes/ProdutosRoutes/Produto");
+const VendasRoute = require("./routes/VendasRoutes/Vendas");
+const ComprasRoute = require("./routes/CompraRoutes/Compra");
+const GraficosRoute = require("./routes/GraficosRoutes/Graficos");
 
 require("dotenv").config();
 
@@ -23,6 +26,9 @@ AppDataSource.initialize().then(async () => {
   //rotas
   app.use("/usuarios", UsuarioRoute);
   app.use("/produtos", ProdutoRoute);
+  app.use("/vendas", VendasRoute);
+  app.use("/graficos", GraficosRoute);
+  app.use("/compras", ComprasRoute);
 
   app.get("/", (req: Request, res: Response) => {
     res.status(200).send("Olá Mundo!!!");

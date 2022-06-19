@@ -64,16 +64,16 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
   //sucesso
   if (response) {
 
-    var payload = {
+    var payload:UsuarioEntity = {
       Id: response.Id,
       nome: response.nome,
       email: response.email,
     }
 
-    var token = jwt.sign(payload, process.env.SECRETKEY)
+
 
     retorno.success = true;
-    retorno.data = token;
+    retorno.data = payload;
 
 
 
