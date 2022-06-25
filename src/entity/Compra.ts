@@ -14,6 +14,9 @@ export class CompraEntity {
     dataCompra?: Date;
 
     @Column({ nullable: false })
+    dataCompraDisplay?: string;
+
+    @Column({ nullable: false })
     pagamentoEfetuado?: boolean;
 
     @Column({ nullable: false })
@@ -21,6 +24,9 @@ export class CompraEntity {
 
     @Column({ nullable: false })
     valorTotal?: number;
+
+    @Column({ nullable: false })
+    valorTotalDisplay?: string;
 
     @Column({ nullable: false })
     valorCompra?: number;
@@ -34,10 +40,13 @@ export class CompraEntity {
     @Column({ nullable: false })
     quantidade?: number;
 
+    @Column({ nullable: false })
+    produtoDisplay?: string;
+
     @ManyToOne(() => ProdutoEntity, (produto) => produto.Id)
     produto!: ProdutoEntity
 
-    
+
     @ManyToOne(() => UsuarioEntity, (usuario) => usuario.Id)
     usuario!: UsuarioEntity;
 
