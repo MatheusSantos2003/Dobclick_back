@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import CategoriaEntity from "./entity/Categoria";
+import {CategoriaEntity} from "./entity/Categoria";
 import { EstoqueEntity } from "./entity/Estoque";
 import { MarcaEntity } from "./entity/Marca";
 import { ProdutoEntity } from "./entity/Produto";
