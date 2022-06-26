@@ -19,7 +19,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE_SCHEMANAME || "dobclick"  ,
   synchronize: true,
   logging: false,
-  entities: ["src/entity/**/*.ts"],
+  entities: [CategoriaEntity,EstoqueEntity,VendaEntity,UsuarioEntity,VendaProdutoEntity,MarcaEntity,ProdutoEntity],
   migrations: ["src/migration/**/*.ts"],
   subscribers: ["src/subscriber/**/*.ts"],
 });
