@@ -1,15 +1,15 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
 
 @Entity({ name: "Categoria" })
-export default class CategoriaEntity {
+export class CategoriaEntity {
 
     @PrimaryGeneratedColumn()
     Id?: number;
 
     @Column()
-    descricao?:string;
+    descricao?: string;
 
 
 }
