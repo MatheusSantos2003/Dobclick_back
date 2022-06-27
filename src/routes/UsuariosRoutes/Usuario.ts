@@ -51,7 +51,7 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
   usuarioAdd.email = req.body.email;
 
   var senhaSemHash = req.body.senha;
-
+  //adquire a senha, vindo do front end 
 
   const hash = bcrypt.hashSync(senhaSemHash, 10);
 
@@ -111,7 +111,7 @@ router.post('/login', async (req: Request, res: Response) => {
         }
     
         var token = jwt.sign(payload, process.env.SECRETKEY)
-    
+                          
         response.success = true;
         response.data = token;
         res.status(200).send(response);

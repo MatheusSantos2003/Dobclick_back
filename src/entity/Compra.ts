@@ -23,10 +23,7 @@ export class CompraEntity {
     formaPagamento?: number;
 
     @Column({ nullable: false })
-    valorTotal?: number;
-
-    @Column({ nullable: false })
-    valorTotalDisplay?: string;
+    valorCompraDisplay?: string;
 
     @Column({ nullable: false })
     valorCompra?: number;

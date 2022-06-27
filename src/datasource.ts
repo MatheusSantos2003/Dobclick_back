@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import {CategoriaEntity} from "./entity/Categoria";
+import { CompraEntity } from "./entity/Compra";
 import { EstoqueEntity } from "./entity/Estoque";
 import { MarcaEntity } from "./entity/Marca";
 import { ProdutoEntity } from "./entity/Produto";
@@ -19,7 +20,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE_SCHEMANAME || "dobclick"  ,
   synchronize: true,
   logging: false,
-  entities: [CategoriaEntity,EstoqueEntity,VendaEntity,UsuarioEntity,VendaProdutoEntity,MarcaEntity,ProdutoEntity],
+  entities: [CategoriaEntity,EstoqueEntity,VendaEntity,UsuarioEntity,VendaProdutoEntity,MarcaEntity,ProdutoEntity,CompraEntity],
   migrations: ["src/migration/**/*.ts"],
   subscribers: ["src/subscriber/**/*.ts"],
 });

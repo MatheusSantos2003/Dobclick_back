@@ -88,8 +88,8 @@ router.put("/editar", async (req: Request, res: Response) => {
     ProdutoEdit.marca = req.body.data.marca;
     ProdutoEdit.cor = req.body.data.cor;
     ProdutoEdit.estoque = req.body.data.estoque;
+    ProdutoEdit.estoqueTotal = req.body.data.estoqueTotal;
     ProdutoEdit.preco = req.body.data.preco;
-    ProdutoEdit.fornecedorId = Number(req.body.data.fornecedorId);
 
 
     const response = await AppDataSource.manager.update(ProdutoEntity, { Id: ProdutoEdit.Id }, ProdutoEdit);
@@ -150,6 +150,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     ProdutoAdd.marca = req.body.data.marca;
     ProdutoAdd.cor = req.body.data.cor;
     ProdutoAdd.estoque = req.body.data.estoque;
+    ProdutoAdd.estoqueTotal = req.body.data.estoqueTotal;
     ProdutoAdd.fornecedorId = req.body.data.fornecedorId;
     ProdutoAdd.preco = req.body.data.preco;
     ProdutoAdd.usuario = usuario;

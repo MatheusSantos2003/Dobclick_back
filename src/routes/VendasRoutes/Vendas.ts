@@ -51,9 +51,20 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
 
     const { usuarioId, datavenda, quantidade, formaPag, cliente, contatoCliente, produtoId, valorTotal, valorTotalDisplay } = req.body.data;
 
-    const usuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: usuarioId } });
+    const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
 
-    const produtofind = await AppDataSource.manager.findOne(ProdutoEntity, { where: { Id: produtoId } });
+    const produtofind = await AppDataSource.manager.findOneOrFail(ProdutoEntity, { where: { Id: produtoId } });
+
+
+    if(produtofind.estoque != null && produtofind?.estoque < quantidade){
+
+      retorno.success = false;
+      retorno.message = "Quantidade atual do produto maior do que a quantidade da venda";
+      retorno.data = null;
+      res.status(200).send(retorno)
+      return;
+
+    }
 
 
     moment().locale('pt-br');
@@ -85,6 +96,10 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
 
         const VendaProdutoAddResposnse = await AppDataSource.manager.save(VendaProdutoAdd);
 
+        produtofind.estoque = produtofind?.estoque as number - quantidade;
+
+        await AppDataSource.manager.save(produtofind);
+
         if (VendaProdutoAddResposnse.Id != null) {
             retorno.success = true;
             retorno.message = "Sucesso ao registrar a Venda";
@@ -103,9 +118,97 @@ router.post('/cadastrar', async (req: Request, res: Response) => {
 
 router.delete('/delete', async (req: Request, res: Response) => {
 
+    let id = req.body.id;
+  let retorno: ResponseModel = new ResponseModel;
+
+  try {
+
+    const firstResponse = await AppDataSource.manager.findOneOrFail(VendaEntity,{where:{Id:id}});
+    
+    const secondResponse = await AppDataSource.manager.findOneOrFail(VendaProdutoEntity,{where:{venda:firstResponse}});    
+
+    if(secondResponse.Id != null){
+
+        await AppDataSource.manager.getRepository(VendaProdutoEntity).createQueryBuilder().delete().from(VendaProdutoEntity)
+        .where("Id = :Id", { Id:secondResponse.Id }).execute();
+
+        const response = await AppDataSource.getRepository(VendaEntity).createQueryBuilder().delete().from(VendaEntity)
+        .where("Id = :Id", { Id: id })
+        .execute()
+
+        if (response.affected != 0 && response.affected != null) {
+            retorno.success = true;
+            retorno.message = "Venda Excluída com Sucesso!";
+      
+            res.status(200).send(retorno);
+            return;
+          } else {
+            retorno.success = false;
+            retorno.message = "Houve um Erro Ao Excluir a Venda!!";
+            res.status(200).send(retorno);
+            return;
+          }
+    }else{
+        const response = await AppDataSource.getRepository(VendaEntity).createQueryBuilder().delete().from(VendaEntity)
+        .where("Id = :Id", { Id: id })
+        .execute()
+
+        if (response.affected != 0 && response.affected != null) {
+            retorno.success = true;
+            retorno.message = "Venda Excluída com Sucesso!";
+      
+            res.status(200).send(retorno);
+            return;
+          } else {
+            retorno.success = false;
+            retorno.message = "Houve um Erro Ao Excluir a Venda!!";
+            res.status(200).send(retorno);
+            return;
+          }
+    }
+  } catch (error) {
+    retorno.success = false;
+    retorno.message = "Houve um Erro Ao Excluir a Venda!! " + error;
+    res.status(200).send(retorno);
+    return;
+  }
+
+
 });
 
-router.delete('/deleporLista', async (req: Request, res: Response) => {
+router.delete('/deleteporLista', async (req: Request, res: Response) => {
+
+    let listaids: number[] = req.body.listaids;
+    let retorno: ResponseModel = new ResponseModel;
+
+    try {
+
+        const response = await AppDataSource.manager.delete(VendaEntity, { Id: In(listaids) });
+    
+        if (response.affected != 0 && response.affected != null) {
+    
+          retorno.success = true;
+          retorno.message = "Venda Excluída com Sucesso!";
+    
+          res.status(200).send(retorno);
+          return;
+    
+        } else {
+    
+          retorno.success = false;
+          retorno.message = "Houve um Erro Ao Excluir a Venda!!";
+          res.status(200).send(retorno);
+          return;
+    
+        }
+      } catch (error) {
+    
+        retorno.success = false;
+        retorno.message = "Houve um Erro Ao Excluir a Venda!! " + error;
+        res.status(200).send(retorno);
+        return;
+    
+      }
 
 });
 

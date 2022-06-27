@@ -7,6 +7,7 @@ import { UsuarioEntity } from "../../entity/Usuario";
 import { ProdutoEntity } from "../../entity/Produto";
 import moment from "moment";
 import "moment/locale/pt-br";
+import { In } from "typeorm";
 
 require("dotenv").config();
 const express = require("express");
@@ -17,7 +18,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     let response: ResponseModel = new ResponseModel();
     let CompraAdd = new CompraEntity();
 
-    const { dataCompra, pagamentoEfetuado, formaPagamento, valorTotal, valorCompra, fornecedor, fornecedorContato, quantidade, usuarioId, produtoId } = req.body.data;
+    const { dataCompra, formaPagamento, valorCompra,valorCompraDisplay, fornecedor, fornecedorContato, quantidade, usuarioId, produtoId } = req.body.data;
 
     try {
         const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
@@ -29,9 +30,8 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
         CompraAdd.dataCompra = dataCompra;
         CompraAdd.dataCompraDisplay = dataformatada;
         CompraAdd.formaPagamento = formaPagamento;
-        CompraAdd.pagamentoEfetuado = pagamentoEfetuado;
-        CompraAdd.valorTotal = valorTotal;
-        CompraAdd.valorTotalDisplay = String(valorTotal);1
+        CompraAdd.pagamentoEfetuado = true;
+        CompraAdd.valorCompraDisplay = valorCompraDisplay;
         CompraAdd.valorCompra = valorCompra;
         CompraAdd.fornecedor = fornecedor;
         CompraAdd.fornecedorContato = fornecedorContato;
@@ -40,9 +40,13 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
         CompraAdd.produto = produtoFind;
         CompraAdd.produtoDisplay = produtoFind.descricao;
 
-        console.log(CompraAdd);
-
         await AppDataSource.manager.save(CompraAdd);
+
+        var valuetoAdd: number = Number(quantidade);
+        produtoFind.estoque = produtoFind.estoque as number;
+        produtoFind.estoque = produtoFind.estoque  += valuetoAdd;
+
+        await AppDataSource.manager.save(produtoFind);
 
         response.success = true;
         response.message = "Cadastrado!";
@@ -82,8 +86,72 @@ router.post('/listar', async (req: Request, res: Response) => {
     }
 });
 
+router.delete('/delete', async (req:Request, res:Response) => {   
+    let id = req.body.id;
+    let retorno: ResponseModel = new ResponseModel;
+  
+    try {
+  
+      const response = await AppDataSource.getRepository(CompraEntity).createQueryBuilder().delete().from(CompraEntity)
+        .where("Id = :Id", { Id: id })
+        .execute()
+  
+      if (response.affected != 0 && response.affected != null) {
+        retorno.success = true;
+        retorno.message = "Compra Excluído com Sucesso!";
+  
+        res.status(200).send(retorno);
+        return;
+      } else {
+        retorno.success = false;
+        retorno.message = "Houve um Erro Ao Excluir a Compra!!";
+        res.status(200).send(retorno);
+        return;
+      }
+  
+    } catch (error) {
+      retorno.success = false;
+      retorno.message = "Houve um Erro Ao Excluir a Compra!! " + error;
+      res.status(200).send(retorno);
+      return;
+    }
+ });
 
+ router.delete('/deleteporLista', async (req:Request, res:Response) => {   
 
+    let listaids: number[] = req.body.listaids;
+  let retorno: ResponseModel = new ResponseModel;
+
+  try {
+
+    const response = await AppDataSource.manager.delete(CompraEntity, { Id: In(listaids) });
+
+    if (response.affected != 0 && response.affected != null) {
+
+      retorno.success = true;
+      retorno.message = "Compra Excluída com Sucesso!";
+
+      res.status(200).send(retorno);
+      return;
+
+    } else {
+
+      retorno.success = false;
+      retorno.message = "Houve um Erro Ao Excluir a Compra!!";
+      res.status(200).send(retorno);
+      return;
+
+    }
+  } catch (error) {
+
+    retorno.success = false;
+    retorno.message = "Houve um Erro Ao Excluir a Compra!! " + error;
+    res.status(200).send(retorno);
+    return;
+
+  }
+
+});
 
 
 

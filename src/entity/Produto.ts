@@ -27,6 +27,9 @@ export class ProdutoEntity {
     cor?: string;
 
     @Column(({nullable:false,default: 0}))
+    estoqueTotal?: number;
+
+    @Column(({nullable:false,default: 0}))
     estoque?: number;
 
     @Column(({nullable:false,default:0.0,type:"float"}))
