@@ -2,6 +2,9 @@
   "name": "Dobclick_back",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "14.x"
+  },
   "repository": "https://github.com/MatheusHenrique200302/Dobclick_back.git",
   "author": "Matheus Santos <mt.pesc@hotmail.com>",
   "license": "MIT",
