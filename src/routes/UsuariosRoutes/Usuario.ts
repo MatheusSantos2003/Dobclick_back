@@ -110,7 +110,7 @@ router.post('/login', async (req: Request, res: Response) => {
           email: UsuarioFind.email
         }
     
-        var token = jwt.sign(payload, process.env.SECRETKEY)
+        var token = jwt.sign(payload, process.env.SECRETKEY || "dobclick2022")
                           
         response.success = true;
         response.data = token;
