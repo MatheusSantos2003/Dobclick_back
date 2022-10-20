@@ -284,6 +284,7 @@ router.post('/obterDadosGraficos', async (req: Request, res: Response) => {
 
     var ProdutoNome: String = resultado[0]?.descricao;
 
+
     var Quantidades: Array<number> = resultado.map((res) => {
         return res.quantidade;
     });
@@ -301,11 +302,17 @@ router.post('/obterDadosGraficos', async (req: Request, res: Response) => {
     var produtoEstoqueAtencao: ProdutoEntity = new ProdutoEntity();
 
     var resultProdutosEstoqueBaixo: Array<any> = 
-    await AppDataSource.manager.query('SELECT * FROM (SELECT prod.* ,(prod.estoque * prod."estoqueTotal")/100 as porcentagem FROM "Produto" prod) as resultado WHERE porcentagem != 0 '+
-    ' AND resultado."usuarioId" = $1',
+    await AppDataSource.manager.query('SELECT * FROM (SELECT prod.* FROM "Produto" prod) as resultado WHERE  '+
+    ' resultado."usuarioId" = $1',
     [usuarioId]
     );
      
+    resultProdutosEstoqueBaixo.map((res) => {
+        res.porcentagem = (res.estoque / res.estoqueTotal) * 100;
+        res.porcentagem =  Number(res.porcentagem.toFixed(2));
+    }); 
+
+     console.log(resultProdutosEstoqueBaixo);
     
     // createQueryBuilder()
         // .select('*,(produto.estoque * produto."estoqueTotal")/100 as porcentagem')
