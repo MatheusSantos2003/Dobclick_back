@@ -185,4 +185,65 @@ router.post('/esqueceu-senha', async (req: Request, res: Response) => {
 
 });
 
+router.post('/validar-recuperar-senha', async (req: Request, res: Response) =>{
+  let response: ResponseModel = new ResponseModel();
+  const token = req.body.token;
+
+  const TokenFound = await AppDataSource.manager.findOne(ResetPasswordEntity,{where:{token:token}});
+
+  if(TokenFound){
+    response.success = true;
+    response.data = true;
+    response.message = "Token Valido!";
+    res.status(200).send(response);
+    return;
+  }else{
+    response.success = false;
+    response.data = false;
+    response.message = "Token Invalido!";
+    res.status(200).send(response);
+    return;
+  }
+
+});
+
+router.put('/trocar-senha', async (req: Request, res: Response) =>{
+  const { email,senha } = req.body;
+  let retorno: ResponseModel = new ResponseModel;
+
+  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email } });
+
+  if(UsuarioFind){
+    var senhaSemHash = senha;
+    //adquire a senha, vindo do front end 
+  
+    const hash = bcrypt.hashSync(senhaSemHash, 10);
+  
+    UsuarioFind.senha = hash;
+
+   const userResult = await AppDataSource.manager.save(UsuarioFind);
+
+   if(userResult){
+    retorno.success = true;
+    retorno.data = userResult;
+    retorno.message = "Senha alterada com successo!";
+    res.status(200).send(retorno);
+    return;
+   } else{
+    retorno.success = false;
+    retorno.message = "Houve um Erro ao alterar a senha";
+    res.status(200).send(retorno);
+    return;
+   }
+  
+  }else{
+    retorno.success = false;
+    retorno.data = null;
+    retorno.message = "Email não Cadastrado";
+    res.status(200).send(retorno);
+    return;
+  }
+
+});
+
 module.exports = router;
