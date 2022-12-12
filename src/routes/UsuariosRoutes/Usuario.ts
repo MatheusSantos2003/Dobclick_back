@@ -193,7 +193,7 @@ router.post('/validar-recuperar-senha', async (req: Request, res: Response) =>{
 
   if(TokenFound){
     response.success = true;
-    response.data = true;
+    response.data = TokenFound;
     response.message = "Token Valido!";
     res.status(200).send(response);
     return;
@@ -211,7 +211,7 @@ router.put('/trocar-senha', async (req: Request, res: Response) =>{
   const { email,senha } = req.body;
   let retorno: ResponseModel = new ResponseModel;
 
-  const UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email } });
+  let UsuarioFind = await AppDataSource.manager.findOne(UsuarioEntity, { where: { email: email } });
 
   if(UsuarioFind){
     var senhaSemHash = senha;
@@ -221,8 +221,8 @@ router.put('/trocar-senha', async (req: Request, res: Response) =>{
   
     UsuarioFind.senha = hash;
 
-   const userResult = await AppDataSource.manager.save(UsuarioFind);
 
+   const userResult = await AppDataSource.manager.update(UsuarioEntity,{Id: UsuarioFind.Id},UsuarioFind);
    if(userResult){
     retorno.success = true;
     retorno.data = userResult;
