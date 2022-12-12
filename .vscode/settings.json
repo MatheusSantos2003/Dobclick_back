@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/3311c97c-70df-4d82-88f9-1440b74cac5d/appservices/subscriptions/3311c97c-70df-4d82-88f9-1440b74cac5d/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/dobclick",
+    "appService.deploySubpath": "."
+}
