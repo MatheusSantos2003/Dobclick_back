@@ -131,9 +131,12 @@ router.post("/obterDadosGraficos", async (req: Request, res: Response) => {
     vendasTerca += venda.ValorVenda;
   });
 
+
   resultCompraTerca.forEach((compra) => {
-    comprasTerca += compra.valorTotal;
+    comprasTerca += compra.valorCompra;
   });
+
+
 
   var lucroTerca = vendasTerca - comprasTerca;
 
@@ -261,25 +264,67 @@ router.post("/obterDadosGraficos", async (req: Request, res: Response) => {
 
   var IdProduto = produtoComMaiorVendaSemana[0]?.produtoId;
 
-  var resultado: Array<any> = await AppDataSource.manager.query(
-    'SELECT produto."descricao",vendaProduto.quantidade  FROM "Produto" produto ' +
-      ' INNER JOIN "VendaProduto" vendaProduto ON vendaProduto."produtoId" = produto."Id" ' +
-      ' INNER JOIN "Venda" venda ON vendaProduto."vendaId" = venda."Id" ' +
-      ' WHERE produto."Id" = $1 AND produto."usuarioId" = $2' +
-      " AND venda.datavenda BETWEEN SYMMETRIC" +
-      " $3 AND $4 ",
+  var query = 'SELECT produto."descricao",vendaProduto.quantidade, venda.datavenda  FROM "Produto" produto ' +
+  ' INNER JOIN "VendaProduto" vendaProduto ON vendaProduto."produtoId" = produto."Id" ' +
+  ' INNER JOIN "Venda" venda ON vendaProduto."vendaId" = venda."Id" ' +
+  ' WHERE produto."Id" = $1 AND produto."usuarioId" = $2' +
+  " AND venda.datavenda BETWEEN SYMMETRIC" +
+  " $3 AND $4 ";
+
+
+
+  var resultado: Array<any> = await AppDataSource.manager.query(query,
     [IdProduto, usuarioId, domingo, sabado]
   );
 
+  // console.log(new Date(resultado[0].datavenda).getDate() === domingo.getDate());
+  let arraySemana = [0,0,0,0,0,0,0];
+  resultado.map((value)=>{
+
+    if(new Date(value.datavenda).getDate() === domingo.getDate()){
+      arraySemana[0] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === segunda.getDate()){
+      arraySemana[1] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === terca.getDate()){
+      arraySemana[2] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === quarta.getDate()){
+      arraySemana[3] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === quinta.getDate()){
+      arraySemana[4] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === sexta.getDate()){
+      arraySemana[5] += Number(value.quantidade);
+    }
+
+    if(new Date(value.datavenda).getDate() === sabado.getDate()){
+      arraySemana[6] += Number(value.quantidade);
+    }
+
+
+
+
+  });
+
+
+
   var ProdutoNome: String = resultado[0]?.descricao;
 
-  var Quantidades: Array<number> = resultado.map((res) => {
-    return res.quantidade;
-  });
+  // var Quantidades: Array<number> = resultado.map((res) => {
+  //   return res.quantidade;
+  // });
 
   var ProdutoMaisVendidoObject = {
     name: ProdutoNome,
-    data: Quantidades,
+    data: arraySemana,
   };
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
