@@ -3,12 +3,13 @@ import { Request, response, Response } from "express";
 import { AppDataSource } from "../../datasource";
 import { ResponseModel } from "../../models/Response.model";
 import { ProdutoEntity } from "../../entity/Produto";
-import { In } from "typeorm";
+import { Equal, In } from "typeorm";
 import { UsuarioEntity } from "../../entity/Usuario";
 import { VendaEntity } from "../../entity/Venda";
 import { VendaProdutoEntity } from "../../entity/VendaProduto";
 import moment from "moment";
 import "moment/locale/pt-br";
+import { ClienteEntity } from "../../entity/Cliente";
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -17,6 +18,8 @@ const router = express.Router();
 
 router.post("/listar", async (req: Request, res: Response) => {
   const userId = Number(req.body.id);
+
+  const user = await AppDataSource.manager.findOne(UsuarioEntity,{where:{Id: userId}});
   var response = new ResponseModel();
 
   if (isNaN(userId)) {
@@ -27,16 +30,15 @@ router.post("/listar", async (req: Request, res: Response) => {
   }
 
   try {
-    const VendasResponse = await AppDataSource.createQueryBuilder()
-      .select("*")
-      .from(VendaEntity, "venda")
-      .where(" venda.usuarioId = :id", { id: userId })
-      .orderBy("venda.Id")
-      .execute();
+ 
+    const VendasResponse = await AppDataSource.manager.find(VendaEntity,{where: {usuario: user as UsuarioEntity}});
 
+    
+        
     response.success = true;
     response.message = "Listado!";
     response.data = VendasResponse;
+    console.log(VendasResponse);
     res.status(200).send(response);
     return;
   } catch (error) {
@@ -59,7 +61,6 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     quantidade,
     formaPag,
     cliente,
-    contatoCliente,
     produtoId,
     valorTotal,
     valorTotalDisplay,
@@ -93,7 +94,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
   );
   VendaAdd.dataVendaDisplay = dataformatada;
   VendaAdd.cliente = cliente;
-  VendaAdd.clienteContato = contatoCliente;
+  // VendaAdd.clienteContato = contatoCliente;
   VendaAdd.formaPagamento = formaPag;
   VendaAdd.usuario = usuarioFind as UsuarioEntity;
   VendaAdd.pagamentoEfetuado = true;
@@ -145,7 +146,7 @@ router.delete("/delete", async (req: Request, res: Response) => {
 
     const secondResponse = await AppDataSource.manager.findOneOrFail(
       VendaProdutoEntity,
-      { where: { venda: firstResponse } }
+      { where: { venda: Equal(firstResponse) } }
     );
 
     if (secondResponse.Id != null) {
@@ -173,6 +174,7 @@ router.delete("/delete", async (req: Request, res: Response) => {
       } else {
         retorno.success = false;
         retorno.message = "Houve um Erro Ao Excluir a Venda!!";
+        console.log(response);
         res.status(200).send(retorno);
         return;
       }

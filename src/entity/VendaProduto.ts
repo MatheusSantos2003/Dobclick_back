@@ -11,7 +11,7 @@ export class VendaProdutoEntity {
     Id?: number;
 
     @ManyToOne(() => VendaEntity, (venda) => venda.Id,{ onDelete: 'CASCADE' })
-    venda!: VendaEntity | null;
+    venda!: VendaEntity;
 
     @ManyToOne(() => ProdutoEntity, (produto) => produto.Id)
     produto!: ProdutoEntity

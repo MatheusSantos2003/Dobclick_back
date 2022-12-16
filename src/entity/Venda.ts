@@ -1,4 +1,5 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ClienteEntity } from "./Cliente";
 
 import { UsuarioEntity } from "./Usuario";
 
@@ -24,11 +25,8 @@ export class VendaEntity {
     @Column({ nullable: true })
     valorTotalDisplay?: string;
 
-    @Column({nullable:false})
-    cliente?: string;
-
-    @Column({nullable:false})
-    clienteContato?: string;
+    @ManyToOne(() => ClienteEntity, (cliente) => cliente.Id)
+    cliente!: ClienteEntity
 
     @Column({nullable:false})
     produtoDisplay?:string;
