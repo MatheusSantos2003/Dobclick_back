@@ -7,6 +7,7 @@ import { ResponseModel } from "../../models/Response.model";
 import { ResetPasswordEntity } from "../../entity/ResetPassword";
 import { ClienteEntity } from "../../entity/Cliente";
 import { In } from "typeorm";
+import { FornecedorEntity } from "../../entity/Fornecedor";
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
@@ -425,5 +426,186 @@ router.get('/listar-clientes/:id', async (req: Request, res: Response) => {
     return;
   }
 });
+
+// region Fornecedor
+router.post('/cadastrar-fornecedor', async (req: Request, res: Response) => {
+  let response: ResponseModel = new ResponseModel();
+  const { nome, contato, userId } = req.body;
+
+  const novoFornecedor = new FornecedorEntity();
+
+  const User = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: userId } });
+
+
+  if (User) {
+    novoFornecedor.descricao = nome;
+    novoFornecedor.contato = contato;
+    novoFornecedor.usuario = User;
+
+    const created = await AppDataSource.manager.save(novoFornecedor);
+    if (created) {
+      response.success = true;
+      response.data = created;
+      response.message = "Fornecedor criado com sucesso!";
+      res.status(200).send(response);
+      return;
+    } else {
+      response.success = false;
+      response.data = false;
+      response.message = "Erro ao criar Fornecedor";
+      res.status(200).send(response);
+      return;
+    }
+
+  } else {
+    response.success = false;
+    response.data = false;
+    response.message = "Usuário não encontrado";
+    res.status(200).send(response);
+    return;
+  }
+
+
+
+})
+
+router.put('/editar-fornecedor', async (req: Request, res: Response) => {
+  const { IdEdit, nomeEdit, contatoEdit, usuarioId } = req.body;
+  let response = new ResponseModel();
+
+
+
+  const user = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: usuarioId } });
+
+  const forn = await AppDataSource.manager.findOne(FornecedorEntity, { where: { Id: Number(IdEdit) } });
+
+  if (forn && user) {
+    let edit = new FornecedorEntity();
+    edit.Id = forn.Id;
+    edit.descricao = nomeEdit;
+    edit.contato = contatoEdit;
+    edit.usuario = user;
+
+    const result = await AppDataSource.manager.update(FornecedorEntity, edit.Id, edit);
+
+    if (result.affected != 0 && result.affected != null) {
+      response.success = true;
+      response.data = edit;
+      response.message = "Fornecedor editado com sucesso!";
+      res.status(200).send(response);
+      return;
+    } else {
+      response.success = false;
+      response.data = false;
+      response.message = "Erro ao editar Fornecedor";
+      res.status(200).send(response);
+      return;
+    }
+
+  }else{
+    response.success = false;
+    response.data = false;
+    response.message = "Fornecedor / Usuário não encontrado";
+    res.status(200).send(response);
+    return;
+  }
+
+});
+
+router.delete('/deletar-fornecedor',async (req:Request,res:Response) => {
+  const {id} = req.body;
+  let response = new ResponseModel();
+
+  const cliente = await AppDataSource.manager.findOne(FornecedorEntity, { where:{Id: id} });
+
+  if(cliente){
+
+    const result = await AppDataSource.manager.delete(FornecedorEntity,{Id:id});
+
+    if(result.affected!= 0 && result.affected!= null){
+      response.success = true;
+      response.data = null;
+      response.message = "Fornecedor deletado com sucesso!";
+      res.status(200).send(response);
+      return;
+    }else{
+      response.success = false;
+      response.data = null;
+      response.message = "Erro ao deletar Fornecedor";
+      res.status(200).send(response);
+      return;
+    }
+
+  }else{
+    response.success = false;
+    response.data = null;
+    response.message = "Fornecedor não encontrado";
+    res.status(200).send(response);
+    return;
+  }
+
+
+})
+
+router.delete('/deletar-lista-fornecedor', async (req:Request,res:Response) =>{
+  let listaids: number[] = req.body.listaids;
+  let retorno: ResponseModel = new ResponseModel;
+
+  try {
+
+    const response = await AppDataSource.manager.delete(FornecedorEntity, { Id: In(listaids) });
+
+    if (response.affected != 0 && response.affected != null) {
+
+      retorno.success = true;
+      retorno.message = "Fornecedor Excluído com Sucesso!";
+
+      res.status(200).send(retorno);
+      return;
+
+    } else {
+
+      retorno.success = false;
+      retorno.message = "Houve um Erro Ao Excluir os Fornecedores!!";
+      res.status(200).send(retorno);
+      return;
+
+    }
+  } catch (error) {
+
+    retorno.success = false;
+    retorno.message = "Houve um Erro Ao Excluir os Fornecedores!! " + error;
+    res.status(200).send(retorno);
+    return;
+
+  }
+});
+
+router.get('/listar-fornecedor/:id', async (req: Request, res: Response) => {
+  let id = Number(req.params.id);
+  let retorno: ResponseModel = new ResponseModel;
+
+
+  const User = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: id } });
+
+  if (User) {
+    const clientArray = await AppDataSource.manager.find(FornecedorEntity, { where: { usuario: User } });
+
+
+    retorno.success = true;
+    retorno.data = clientArray;
+    retorno.message = "Clientes encontrados com sucesso!";
+    res.status(200).send(retorno);
+    return;
+  } else {
+    retorno.success = false;
+    retorno.data = null;
+    retorno.message = "Clientes não encontrados";
+    res.status(200).send(retorno);
+    return;
+  }
+});
+
+
 
 module.exports = router;
