@@ -31,19 +31,23 @@ router.post("/listar", async (req: Request, res: Response) => {
 
   try {
 
-    const VendasResponse = await AppDataSource.manager.find(VendaEntity, { where: { usuario: user as UsuarioEntity } });
+    // const VendasResponse = await AppDataSource.manager.find(VendaEntity, { where: { usuario: user as UsuarioEntity } });
     const clientes = await AppDataSource.manager.find(ClienteEntity, { where: { usuario: user as UsuarioEntity } });
 
+    
+    const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("*").from(VendaEntity,"venda").where(' venda.usuarioId = :id',{ id: userId }).execute();
+  
 
     const dataToReturn: any[] = [];
-    VendasResponse.map((venda) => {
-      let ThisVendaClient = clientes.find((x) => x.Id === venda.cliente.Id);
+ 
+    for await (const venda of QueryResponse) {
+      let ThisVendaClient = clientes.find((x) => x.Id === venda.clienteId);
 
-      if (ThisVendaClient) {
+      
         dataToReturn.push({ ...venda, "cliente": ThisVendaClient });
-      }
-    })
-
+    } 
+ 
+ 
     response.success = true;
     response.message = "Listado!"; 
     response.data = dataToReturn;
@@ -53,6 +57,7 @@ router.post("/listar", async (req: Request, res: Response) => {
     response.success = false;
     response.message = "Erro: " + error;
     response.data = null;
+    console.log(response);
     res.status(200).send(response);
     return;
   }
@@ -160,7 +165,6 @@ router.delete("/delete", async (req: Request, res: Response) => {
       VendaProdutoEntity,
       { where: { venda: Equal(firstResponse) } }
     );
-    console.log(secondResponse);
     if (secondResponse.Id != null) {
       await AppDataSource.manager
         .getRepository(VendaProdutoEntity)

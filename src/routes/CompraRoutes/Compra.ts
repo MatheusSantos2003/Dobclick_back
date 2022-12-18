@@ -20,11 +20,11 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     let CompraAdd = new CompraEntity();
 
     const { dataCompra, formaPagamento, valorCompra,valorCompraDisplay, fornecedor,  quantidade, usuarioId, produtoId } = req.body.data;
-
+    console.log(req.body.data);
     try {
         const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
         const produtoFind = await AppDataSource.manager.findOneOrFail(ProdutoEntity, { where: { Id: produtoId } });
-        // const fornecedorFind = await AppDataSource.manager.findOneOrFail(FornecedorEntity,{ where: { Id: fornecedor.Id } });
+        const fornecedorFind = await AppDataSource.manager.findOneOrFail(FornecedorEntity,{ where: { Id: fornecedor.Id } });
 
         moment().locale('pt-br');
         var dataformatada = moment(dataCompra).format('L');
@@ -35,7 +35,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
         CompraAdd.pagamentoEfetuado = true;
         CompraAdd.valorCompraDisplay = valorCompraDisplay;
         CompraAdd.valorCompra = valorCompra;
-        CompraAdd.fornecedor = fornecedor;
+        CompraAdd.fornecedor = fornecedorFind;
   
         CompraAdd.quantidade = quantidade;
         CompraAdd.usuario = usuarioFind;
@@ -71,12 +71,24 @@ router.post('/listar', async (req: Request, res: Response) => {
 
     try {
         const usuario = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
+        const fornecedores = await AppDataSource.manager.find(FornecedorEntity, { where: { usuario: usuario } });
 
-        const resultado = await AppDataSource.manager.find(CompraEntity, { where: { usuario: usuario } });
+        const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("*").from(CompraEntity,"compra").where(' compra.usuarioId = :id',{ id: usuario.Id  }).execute();
+        console.log(QueryResponse);
+        // const resultado = await AppDataSource.manager.find(CompraEntity, { where: { usuario: usuario } });
 
+        const dataToReturn: any[] = [];
+ 
+        for await (const venda of QueryResponse) {
+          let ThisVendaClient = fornecedores.find((x) => x.Id === venda.fornecedorId);
+        
+          
+            dataToReturn.push({ ...venda, "fornecedor": ThisVendaClient });
+        } 
 
         response.success = true;
-        response.data = resultado;
+        response.data = dataToReturn;
+        console.log(dataToReturn);
         response.message = "listado com sucesso!";  
         res.status(200).send(response);
     } catch (error) {
