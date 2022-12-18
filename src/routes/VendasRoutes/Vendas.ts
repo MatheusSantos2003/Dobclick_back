@@ -19,7 +19,7 @@ const router = express.Router();
 router.post("/listar", async (req: Request, res: Response) => {
   const userId = Number(req.body.id);
 
-  const user = await AppDataSource.manager.findOne(UsuarioEntity,{where:{Id: userId}});
+  const user = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: userId } });
   var response = new ResponseModel();
 
   if (isNaN(userId)) {
@@ -30,15 +30,23 @@ router.post("/listar", async (req: Request, res: Response) => {
   }
 
   try {
- 
-    const VendasResponse = await AppDataSource.manager.find(VendaEntity,{where: {usuario: user as UsuarioEntity}});
 
-    
-        
+    const VendasResponse = await AppDataSource.manager.find(VendaEntity, { where: { usuario: user as UsuarioEntity } });
+    const clientes = await AppDataSource.manager.find(ClienteEntity, { where: { usuario: user as UsuarioEntity } });
+
+
+    const dataToReturn: any[] = [];
+    VendasResponse.map((venda) => {
+      let ThisVendaClient = clientes.find((x) => x.Id === venda.cliente.Id);
+
+      if (ThisVendaClient) {
+        dataToReturn.push({ ...venda, "cliente": ThisVendaClient });
+      }
+    })
+
     response.success = true;
-    response.message = "Listado!";
-    response.data = VendasResponse;
-    console.log(VendasResponse);
+    response.message = "Listado!"; 
+    response.data = dataToReturn;
     res.status(200).send(response);
     return;
   } catch (error) {
@@ -65,7 +73,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     valorTotal,
     valorTotalDisplay,
   } = req.body.data;
-  console.log(datavenda);
+
 
   const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, {
     where: { Id: usuarioId },
@@ -73,6 +81,10 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
 
   const produtofind = await AppDataSource.manager.findOneOrFail(ProdutoEntity, {
     where: { Id: produtoId },
+  });
+
+  const clienteFind = await AppDataSource.manager.findOneOrFail(ClienteEntity, {
+    where: { Id: cliente.Id },
   });
 
   if (produtofind.estoque != null && produtofind?.estoque < quantidade) {
@@ -93,7 +105,7 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     novadata.getTime() - novadata.getTimezoneOffset() * -60000
   );
   VendaAdd.dataVendaDisplay = dataformatada;
-  VendaAdd.cliente = cliente;
+  VendaAdd.cliente = clienteFind;
   // VendaAdd.clienteContato = contatoCliente;
   VendaAdd.formaPagamento = formaPag;
   VendaAdd.usuario = usuarioFind as UsuarioEntity;
@@ -148,7 +160,7 @@ router.delete("/delete", async (req: Request, res: Response) => {
       VendaProdutoEntity,
       { where: { venda: Equal(firstResponse) } }
     );
-
+    console.log(secondResponse);
     if (secondResponse.Id != null) {
       await AppDataSource.manager
         .getRepository(VendaProdutoEntity)
@@ -174,7 +186,7 @@ router.delete("/delete", async (req: Request, res: Response) => {
       } else {
         retorno.success = false;
         retorno.message = "Houve um Erro Ao Excluir a Venda!!";
-        console.log(response);
+        // console.log(response);
         res.status(200).send(retorno);
         return;
       }

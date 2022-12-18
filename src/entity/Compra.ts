@@ -1,4 +1,5 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { FornecedorEntity } from "./Fornecedor";
 import { ProdutoEntity } from "./Produto";
 import { UsuarioEntity } from "./Usuario";
 
@@ -28,11 +29,8 @@ export class CompraEntity {
     @Column({ nullable: false })
     valorCompra?: number;
 
-    @Column({ nullable: false })
-    fornecedor?: string;
-
-    @Column({ nullable: false })
-    fornecedorContato?: string;
+    @ManyToOne(() => FornecedorEntity, (forn) => forn.Id)
+    fornecedor!: FornecedorEntity
 
     @Column({ nullable: false })
     quantidade?: number;

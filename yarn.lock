@@ -9,6 +9,31 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@fast-csv/format@4.3.5":
+  "integrity" "sha512-8iRn6QF3I8Ak78lNAa+Gdl5MJJBM5vRHivFtMRUWINdevNo00K7OXxS2PshawLKTejVwieIlPmK5YlLu6w4u8A=="
+  "resolved" "https://registry.npmjs.org/@fast-csv/format/-/format-4.3.5.tgz"
+  "version" "4.3.5"
+  dependencies:
+    "@types/node" "^14.0.1"
+    "lodash.escaperegexp" "^4.1.2"
+    "lodash.isboolean" "^3.0.3"
+    "lodash.isequal" "^4.5.0"
+    "lodash.isfunction" "^3.0.9"
+    "lodash.isnil" "^4.0.0"
+
+"@fast-csv/parse@4.3.6":
+  "integrity" "sha512-uRsLYksqpbDmWaSmzvJcuApSEe38+6NQZBUsuAyMZKqHxH0g1wcJgsKUvN3WC8tewaqFjBMMGrkHmC+T7k8LvA=="
+  "resolved" "https://registry.npmjs.org/@fast-csv/parse/-/parse-4.3.6.tgz"
+  "version" "4.3.6"
+  dependencies:
+    "@types/node" "^14.0.1"
+    "lodash.escaperegexp" "^4.1.2"
+    "lodash.groupby" "^4.6.0"
+    "lodash.isfunction" "^3.0.9"
+    "lodash.isnil" "^4.0.0"
+    "lodash.isundefined" "^3.0.1"
+    "lodash.uniq" "^4.5.0"
+
 "@jridgewell/resolve-uri@^3.0.3":
   "integrity" "sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w=="
   "resolved" "https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.0.tgz"
@@ -117,6 +142,11 @@
   "integrity" "sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw=="
   "resolved" "https://registry.npmjs.org/@types/node/-/node-17.0.45.tgz"
   "version" "17.0.45"
+
+"@types/node@^14.0.1":
+  "integrity" "sha512-2ATO8pfhG1kDvw4Lc4C0GXIMSQFFJBCo/R1fSgTwmUlq5oy95LXyjDQinsRVgQY6gp6ghh3H91wk9ES5/5C+Tw=="
+  "resolved" "https://registry.npmjs.org/@types/node/-/node-14.18.35.tgz"
+  "version" "14.18.35"
 
 "@types/qs@*":
   "integrity" "sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw=="
@@ -588,6 +618,14 @@
     "utils-merge" "1.0.1"
     "vary" "~1.1.2"
 
+"fast-csv@^4.3.6":
+  "integrity" "sha512-2RNSpuwwsJGP0frGsOmTb9oUF+VkFSM4SyLTDgwf2ciHWTarN0lQTC+F2f/t5J9QjW+c65VFIAAu85GsvMIusw=="
+  "resolved" "https://registry.npmjs.org/fast-csv/-/fast-csv-4.3.6.tgz"
+  "version" "4.3.6"
+  dependencies:
+    "@fast-csv/format" "4.3.5"
+    "@fast-csv/parse" "4.3.6"
+
 "fill-range@^7.0.1":
   "integrity" "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ=="
   "resolved" "https://registry.npmjs.org/fill-range/-/fill-range-7.0.1.tgz"
@@ -843,6 +881,16 @@
     "jwa" "^1.4.1"
     "safe-buffer" "^5.0.1"
 
+"lodash.escaperegexp@^4.1.2":
+  "integrity" "sha512-TM9YBvyC84ZxE3rgfefxUWiQKLilstD6k7PTGt6wfbtXF8ixIJLOL3VYyV/z+ZiPLsVxAsKAFVwWlWeb2Y8Yyw=="
+  "resolved" "https://registry.npmjs.org/lodash.escaperegexp/-/lodash.escaperegexp-4.1.2.tgz"
+  "version" "4.1.2"
+
+"lodash.groupby@^4.6.0":
+  "integrity" "sha512-5dcWxm23+VAoz+awKmBaiBvzox8+RqMgFhi7UvX9DHZr2HdxHXM/Wrf8cfKpsW37RNrvtPn6hSwNqurSILbmJw=="
+  "resolved" "https://registry.npmjs.org/lodash.groupby/-/lodash.groupby-4.6.0.tgz"
+  "version" "4.6.0"
+
 "lodash.includes@^4.3.0":
   "integrity" "sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w=="
   "resolved" "https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz"
@@ -853,10 +901,25 @@
   "resolved" "https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz"
   "version" "3.0.3"
 
+"lodash.isequal@^4.5.0":
+  "integrity" "sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ=="
+  "resolved" "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.5.0.tgz"
+  "version" "4.5.0"
+
+"lodash.isfunction@^3.0.9":
+  "integrity" "sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw=="
+  "resolved" "https://registry.npmjs.org/lodash.isfunction/-/lodash.isfunction-3.0.9.tgz"
+  "version" "3.0.9"
+
 "lodash.isinteger@^4.0.4":
   "integrity" "sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA=="
   "resolved" "https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz"
   "version" "4.0.4"
+
+"lodash.isnil@^4.0.0":
+  "integrity" "sha512-up2Mzq3545mwVnMhTDMdfoG1OurpA/s5t88JmQX809eH3C8491iu2sfKhTfhQtKY78oPNhiaHJUpT/dUDAAtng=="
+  "resolved" "https://registry.npmjs.org/lodash.isnil/-/lodash.isnil-4.0.0.tgz"
+  "version" "4.0.0"
 
 "lodash.isnumber@^3.0.3":
   "integrity" "sha512-QYqzpfwO3/CWf3XP+Z+tkQsfaLL/EnUlXWVkIk5FUPc4sBdTehEqZONuyRt2P67PXAk+NXmTBcc97zw9t1FQrw=="
@@ -873,10 +936,20 @@
   "resolved" "https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz"
   "version" "4.0.1"
 
+"lodash.isundefined@^3.0.1":
+  "integrity" "sha512-MXB1is3s899/cD8jheYYE2V9qTHwKvt+npCwpD+1Sxm3Q3cECXCiYHjeHWXNwr6Q0SOBPrYUDxendrO6goVTEA=="
+  "resolved" "https://registry.npmjs.org/lodash.isundefined/-/lodash.isundefined-3.0.1.tgz"
+  "version" "3.0.1"
+
 "lodash.once@^4.0.0":
   "integrity" "sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg=="
   "resolved" "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz"
   "version" "4.1.1"
+
+"lodash.uniq@^4.5.0":
+  "integrity" "sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ=="
+  "resolved" "https://registry.npmjs.org/lodash.uniq/-/lodash.uniq-4.5.0.tgz"
+  "version" "4.5.0"
 
 "lru-cache@^6.0.0":
   "integrity" "sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA=="

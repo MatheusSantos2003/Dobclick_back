@@ -26,7 +26,7 @@ export class VendaEntity {
     valorTotalDisplay?: string;
 
     @ManyToOne(() => ClienteEntity, (cliente) => cliente.Id)
-    cliente!: ClienteEntity
+    cliente!: ClienteEntity;
 
     @Column({nullable:false})
     produtoDisplay?:string;

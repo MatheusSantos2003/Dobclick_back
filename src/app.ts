@@ -11,6 +11,8 @@ const ProdutoRoute = require("./routes/ProdutosRoutes/Produto");
 const VendasRoute = require("./routes/VendasRoutes/Vendas");
 const ComprasRoute = require("./routes/CompraRoutes/Compra");
 const GraficosRoute = require("./routes/GraficosRoutes/Graficos");
+const RelatorioRoute = require("./routes/RelatoriosRoutes/Relatorio");
+
 
 require("dotenv").config();
 
@@ -32,6 +34,7 @@ AppDataSource.initialize().then(async () => {
   app.use("/vendas", VendasRoute);
   app.use("/graficos", GraficosRoute);
   app.use("/compras", ComprasRoute);
+  app.use("/relatorios", RelatorioRoute);
 
   app.get("/", (req: Request, res: Response) => {
     res.status(200).send("Olá Mundo!!!");
