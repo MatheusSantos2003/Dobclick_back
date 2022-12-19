@@ -34,7 +34,7 @@ RelatorioRoute.post("/csv", async (request, response) => {
             entity = CompraEntity;
             break;
         case "venda":
-            queryString = `venda."usuarioId" = $1 and venda."dataVenda" >= $2 and venda."dataVenda" <= $3`;
+            queryString = `venda."usuarioId" = $1 and venda."datavenda" >= $2 and venda."datavenda" <= $3`;
             entity = VendaEntity;
             break;
         default:
@@ -86,9 +86,6 @@ RelatorioRoute.post("/csv", async (request, response) => {
     compras.forEach((compra: Object) => {
         const strCompra = JSON.stringify(compra);
         const jsonCompra = JSON.parse(strCompra);
-        console.log(jsonCompra);
-        let tempForn = fornecedor.find((x) => x.Id == jsonCompra.fornecedorId);
-        let tempCliente = cliente.find((x) => x.Id == jsonCompra.clienteId);
 
 
 
