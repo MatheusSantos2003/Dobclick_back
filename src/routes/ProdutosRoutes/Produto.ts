@@ -190,6 +190,8 @@ router.post("/cadastrar-lista", async (req: Request, res: Response) => {
   const ProdutoAdd = new ProdutoEntity();
   let retorno: ResponseModel = new ResponseModel;
   console.log(req.body.data);
+
+  
   const dados:any[] = req.body.data;
 
   const usuarioId = dados[0].usuarioId;
@@ -228,24 +230,7 @@ router.post("/cadastrar-lista", async (req: Request, res: Response) => {
         
           const response = await AppDataSource.manager.save(ProdutoAdd);
   
-      if (response) {
-  
-        retorno.success = true;
-        retorno.data = response;
-        retorno.message = "Produto Cadastrado com sucessso!"
-        res.status(200).send(retorno);
-        return;
-  
-      } else {
-  
-        retorno.success = false;
-        retorno.data = null;
-        retorno.message = "Não foi Possivel Adicionar o Produto!";
-  
-        res.status(200).send(retorno);
-        return;
-  
-      }
+    
     } catch (error) {
       res.status(200).send(error);
       return;
@@ -253,11 +238,11 @@ router.post("/cadastrar-lista", async (req: Request, res: Response) => {
 
   }
 
-  //procura se produto com código igual existe
- 
-
-
-
+    retorno.success = true;
+    retorno.data = response;
+    retorno.message = "Produto Cadastrado com sucessso!"
+    res.status(200).send(retorno);
+    return
 
 });
 
