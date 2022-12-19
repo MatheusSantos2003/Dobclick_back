@@ -69,7 +69,8 @@ RelatorioRoute.post("/csv", async (request, response) => {
         }
     
         // fs.writeFile('./src/routes/RelatoriosRoutes/relatorio-compras.csv', '', function () { console.log('done'); })
-        const writeStream = fs.createWriteStream("./src/routes/RelatoriosRoutes/relatorio-compras.csv");
+        // /src/routes/RelatoriosRoutes/relatorio-compras.csv
+        const writeStream = fs.createWriteStream(path.join(__dirname,"..","relatorio-compras.csv"));
     
     
         if (Object.keys(compras).length === 0) {
@@ -128,7 +129,7 @@ RelatorioRoute.post("/csv", async (request, response) => {
         setTimeout(() => {
             csvStream.end();
             resolve();
-            return response.sendFile(path.join(__dirname, "/relatorio-compras.csv"));
+            return response.sendFile(path.join(__dirname,"..","relatorio-compras.csv"));
         }, 1000);
     });
 
