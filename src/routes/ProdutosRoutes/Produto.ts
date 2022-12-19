@@ -185,6 +185,81 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
 
 });
 
+router.post("/cadastrar-lista", async (req: Request, res: Response) => {
+
+  const ProdutoAdd = new ProdutoEntity();
+  let retorno: ResponseModel = new ResponseModel;
+  console.log(req.body.data);
+  const dados:any[] = req.body.data;
+
+  const usuarioId = dados[0].usuarioId;
+
+  let usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: usuarioId } })
+
+  for await (const prod of dados) {
+    
+    let produto: ProdutoEntity | null = await AppDataSource.createQueryBuilder().select("produto").from(ProdutoEntity,"produto")
+    .where("produto.codigo = :cod",{cod: prod.codigo}).andWhere("produto.usuarioId = :id",{id: usuarioId}).getOne();
+  
+  
+    
+    // //req.body.data.codigousuario
+    if (produto?.Id) {
+  
+      retorno.message = "Código de produto já Cadastrado!!!";
+      retorno.success = false;
+      res.status(200).send(retorno);
+      return;
+  
+    }
+  
+    try {
+      ProdutoAdd.codigo = prod.codigo;
+      ProdutoAdd.descricao = prod.descricao;
+      ProdutoAdd.tamanho = prod.tamanho;
+      ProdutoAdd.genero = prod.genero;
+      ProdutoAdd.marca = prod.marca;
+      ProdutoAdd.cor = prod.cor;
+      ProdutoAdd.estoque = prod.estoque;
+      ProdutoAdd.estoqueTotal = prod.estoqueTotal;
+      ProdutoAdd.fornecedorId = prod.fornecedorId;
+      ProdutoAdd.preco = prod.preco;
+      ProdutoAdd.usuario = usuario;
+        
+          const response = await AppDataSource.manager.save(ProdutoAdd);
+  
+      if (response) {
+  
+        retorno.success = true;
+        retorno.data = response;
+        retorno.message = "Produto Cadastrado com sucessso!"
+        res.status(200).send(retorno);
+        return;
+  
+      } else {
+  
+        retorno.success = false;
+        retorno.data = null;
+        retorno.message = "Não foi Possivel Adicionar o Produto!";
+  
+        res.status(200).send(retorno);
+        return;
+  
+      }
+    } catch (error) {
+      res.status(200).send(error);
+      return;
+    }
+
+  }
+
+  //procura se produto com código igual existe
+ 
+
+
+
+
+});
 
 router.delete("/", async (req: Request, res: Response) => {
   let id = req.body.id;
