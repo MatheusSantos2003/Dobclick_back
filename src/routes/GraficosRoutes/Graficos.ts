@@ -377,6 +377,7 @@ router.post("/obterDadosGraficos", async (req: Request, res: Response) => {
     EstoqueCritico: RetornoProdutoEstoqueCritico,
     EstoqueAtencao: RetornoProdutoEstoqueAtencao,
   };
+  console.log(response.data)
   res.status(200).send(response);
 });
 
