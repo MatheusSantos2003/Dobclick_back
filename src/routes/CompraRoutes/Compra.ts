@@ -16,124 +16,183 @@ const router = express.Router();
 
 
 router.post("/cadastrar", async (req: Request, res: Response) => {
-    let response: ResponseModel = new ResponseModel();
-    let CompraAdd = new CompraEntity();
+  let response: ResponseModel = new ResponseModel();
+  let CompraAdd = new CompraEntity();
 
-    const { dataCompra, formaPagamento, valorCompra,valorCompraDisplay, fornecedor,  quantidade, usuarioId, produtoId } = req.body.data;
-    console.log(req.body.data);
-    try {
-        const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
-        const produtoFind = await AppDataSource.manager.findOneOrFail(ProdutoEntity, { where: { Id: produtoId } });
-        const fornecedorFind = await AppDataSource.manager.findOneOrFail(FornecedorEntity,{ where: { Id: fornecedor.Id } });
+  const { dataCompra, formaPagamento, valorCompra, valorCompraDisplay, fornecedor, quantidade, usuarioId, produtoId } = req.body.data;
+  console.log(req.body.data);
+  try {
+    const usuarioFind = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
+    const produtoFind = await AppDataSource.manager.findOneOrFail(ProdutoEntity, { where: { Id: produtoId } });
+    const fornecedorFind = await AppDataSource.manager.findOneOrFail(FornecedorEntity, { where: { Id: fornecedor.Id } });
 
-        moment().locale('pt-br');
-        var dataformatada = moment(dataCompra).format('L');
+    moment().locale('pt-br');
+    var dataformatada = moment(dataCompra).format('L');
 
-        CompraAdd.dataCompra = dataCompra;
-        CompraAdd.dataCompraDisplay = dataformatada;
-        CompraAdd.formaPagamento = formaPagamento;
-        CompraAdd.pagamentoEfetuado = true;
-        CompraAdd.valorCompraDisplay = valorCompraDisplay;
-        CompraAdd.valorCompra = valorCompra;
-        CompraAdd.fornecedor = fornecedorFind;
-  
-        CompraAdd.quantidade = quantidade;
-        CompraAdd.usuario = usuarioFind;
-        CompraAdd.produto = produtoFind;
-        CompraAdd.produtoDisplay = produtoFind.descricao;
+    CompraAdd.dataCompra = dataCompra;
+    CompraAdd.dataCompraDisplay = dataformatada;
+    CompraAdd.formaPagamento = formaPagamento;
+    CompraAdd.pagamentoEfetuado = true;
+    CompraAdd.valorCompraDisplay = valorCompraDisplay;
+    CompraAdd.valorCompra = valorCompra;
+    CompraAdd.fornecedor = fornecedorFind;
 
-        await AppDataSource.manager.save(CompraAdd);
+    CompraAdd.quantidade = quantidade;
+    CompraAdd.usuario = usuarioFind;
+    CompraAdd.produto = produtoFind;
+    CompraAdd.produtoDisplay = produtoFind.descricao;
 
-        var valuetoAdd: number = Number(quantidade);
-        produtoFind.estoque = produtoFind.estoque as number;
-        produtoFind.estoque = produtoFind.estoque  += valuetoAdd;
+    await AppDataSource.manager.save(CompraAdd);
 
-        await AppDataSource.manager.save(produtoFind);
+    var valuetoAdd: number = Number(quantidade);
+    produtoFind.estoque = produtoFind.estoque as number;
+    produtoFind.estoque = produtoFind.estoque += valuetoAdd;
 
-        response.success = true;
-        response.message = "Cadastrado!";
-        response.data = "Cadastrado";
+    await AppDataSource.manager.save(produtoFind);
 
-        res.status(200).send(response);
-    } catch (error) {
-        console.log(error);
-        response.success = false;
-        response.message = "Houve um erro ao Cadastrar a Compra!";
-        response.data = null;
+    response.success = true;
+    response.message = "Cadastrado!";
+    response.data = "Cadastrado";
 
-        res.status(200).send(response);
+    res.status(200).send(response);
+  } catch (error) {
+    console.log(error);
+    response.success = false;
+    response.message = "Houve um erro ao Cadastrar a Compra!";
+    response.data = null;
+
+    res.status(200).send(response);
+  }
+});
+
+router.post('/cadastrar-lista', async (req: Request, res: Response) => {
+
+  let response: ResponseModel = new ResponseModel();
+  let CompraAdd = new CompraEntity();
+
+  const data = req.body.data as any[];
+
+  const dataToAdd: CompraEntity[] = [];
+
+  const usuarioFind = await AppDataSource.manager.find(UsuarioEntity, { where: { Id: data[0].usuarioId } });
+  const produtoFind = await AppDataSource.manager.find(ProdutoEntity, { where: { usuario: usuarioFind[0].Id as UsuarioEntity } });
+  const fornecedorFind = await AppDataSource.manager.find(FornecedorEntity, { where: { usuario: usuarioFind[0].Id as UsuarioEntity } });
+
+
+  new Promise<void>(async (resolve, reject) => {
+
+    for await (const dados of data) {
+      let forn = fornecedorFind.find((x) => x.Id === dados.fornecedor);
+      let usu = usuarioFind.find((x) => x.Id === dados.usuarioId);
+      let prod = produtoFind.find((x) => x.Id === dados.produtoId);
+
+      CompraAdd = new CompraEntity();
+      var dataformatada = moment(dados.datacompra).format('L');
+      CompraAdd.dataCompra = dados.datacompra;
+      CompraAdd.dataCompraDisplay = dataformatada;
+      CompraAdd.formaPagamento = Number(dados.formaPag);
+      CompraAdd.pagamentoEfetuado = true;
+      CompraAdd.valorCompraDisplay = dados.valorTotalDisplay;
+      CompraAdd.valorCompra = dados.valorTotal;
+      CompraAdd.fornecedor = forn as FornecedorEntity;
+
+      CompraAdd.quantidade = Number(dados.quantidade);
+      CompraAdd.usuario = usu as UsuarioEntity;
+      CompraAdd.produto = prod as ProdutoEntity;
+      CompraAdd.produtoDisplay = (prod as ProdutoEntity).descricao;
+
+      dataToAdd.push(CompraAdd);
     }
+
+
+
+    console.log(dataToAdd)
+    const resposta = await AppDataSource.manager.createQueryBuilder().insert().into(CompraEntity).values(dataToAdd).execute();
+
+    if (resposta.raw != null) {
+      resolve();
+    } else {
+      reject();
+    }
+
+  }).then(() => {
+    response.success = true;
+    response.data = null;
+    response.message = "Produto Cadastrado com sucessso!"
+    res.status(200).send(response);
+    return;
+  });
 });
 
 router.post('/listar', async (req: Request, res: Response) => {
-    let response = new ResponseModel();
-    var usuarioId = req.body.usuarioId;
+  let response = new ResponseModel();
+  var usuarioId = req.body.usuarioId;
 
-    try {
-        const usuario = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
-        const fornecedores = await AppDataSource.manager.find(FornecedorEntity, { where: { usuario: usuario } });
+  try {
+    const usuario = await AppDataSource.manager.findOneOrFail(UsuarioEntity, { where: { Id: usuarioId } });
+    const fornecedores = await AppDataSource.manager.find(FornecedorEntity, { where: { usuario: usuario } });
 
-        const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("*").from(CompraEntity,"compra").where(' compra.usuarioId = :id',{ id: usuario.Id  }).execute();
-        console.log(QueryResponse);
-        // const resultado = await AppDataSource.manager.find(CompraEntity, { where: { usuario: usuario } });
+    const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("*").from(CompraEntity, "compra").where(' compra.usuarioId = :id', { id: usuario.Id }).execute();
+    console.log(QueryResponse);
+    // const resultado = await AppDataSource.manager.find(CompraEntity, { where: { usuario: usuario } });
 
-        const dataToReturn: any[] = [];
- 
-        for await (const venda of QueryResponse) {
-          let ThisVendaClient = fornecedores.find((x) => x.Id === venda.fornecedorId);
-        
-          
-            dataToReturn.push({ ...venda, "fornecedor": ThisVendaClient });
-        } 
+    const dataToReturn: any[] = [];
 
-        response.success = true;
-        response.data = dataToReturn;
-        console.log(dataToReturn);
-        response.message = "listado com sucesso!";  
-        res.status(200).send(response);
-    } catch (error) {
+    for await (const venda of QueryResponse) {
+      let ThisVendaClient = fornecedores.find((x) => x.Id === venda.fornecedorId);
 
-        response.success = false;
-        response.data = null;
-        response.message = "Erro! "+error;
-        res.status(200).send(response);
+
+      dataToReturn.push({ ...venda, "fornecedor": ThisVendaClient?.descricao });
     }
+
+    response.success = true;
+    response.data = dataToReturn;
+    console.log(dataToReturn);
+    response.message = "listado com sucesso!";
+    res.status(200).send(response);
+  } catch (error) {
+
+    response.success = false;
+    response.data = null;
+    response.message = "Erro! " + error;
+    res.status(200).send(response);
+  }
 });
 
-router.delete('/delete', async (req:Request, res:Response) => {   
-    let id = req.body.id;
-    let retorno: ResponseModel = new ResponseModel;
-  
-    try {
-  
-      const response = await AppDataSource.getRepository(CompraEntity).createQueryBuilder().delete().from(CompraEntity)
-        .where("Id = :Id", { Id: id })
-        .execute()
-  
-      if (response.affected != 0 && response.affected != null) {
-        retorno.success = true;
-        retorno.message = "Compra Excluído com Sucesso!";
-  
-        res.status(200).send(retorno);
-        return;
-      } else {
-        retorno.success = false;
-        retorno.message = "Houve um Erro Ao Excluir a Compra!!";
-        res.status(200).send(retorno);
-        return;
-      }
-  
-    } catch (error) {
+router.delete('/delete', async (req: Request, res: Response) => {
+  let id = req.body.id;
+  let retorno: ResponseModel = new ResponseModel;
+
+  try {
+
+    const response = await AppDataSource.getRepository(CompraEntity).createQueryBuilder().delete().from(CompraEntity)
+      .where("Id = :Id", { Id: id })
+      .execute()
+
+    if (response.affected != 0 && response.affected != null) {
+      retorno.success = true;
+      retorno.message = "Compra Excluído com Sucesso!";
+
+      res.status(200).send(retorno);
+      return;
+    } else {
       retorno.success = false;
-      retorno.message = "Houve um Erro Ao Excluir a Compra!! " + error;
+      retorno.message = "Houve um Erro Ao Excluir a Compra!!";
       res.status(200).send(retorno);
       return;
     }
- });
 
- router.delete('/deleteporLista', async (req:Request, res:Response) => {   
+  } catch (error) {
+    retorno.success = false;
+    retorno.message = "Houve um Erro Ao Excluir a Compra!! " + error;
+    res.status(200).send(retorno);
+    return;
+  }
+});
 
-    let listaids: number[] = req.body.listaids;
+router.delete('/deleteporLista', async (req: Request, res: Response) => {
+
+  let listaids: number[] = req.body.listaids;
   let retorno: ResponseModel = new ResponseModel;
 
   try {
