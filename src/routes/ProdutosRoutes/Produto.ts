@@ -15,10 +15,10 @@ const router = express.Router();
 router.post("/listar", async (req: Request, res: Response) => {
   const userId = Number(req.body.id);
   var response = new ResponseModel();
-console.log("usuarioId:" + userId);
-  if(isNaN(userId)){
+  console.log("usuarioId:" + userId);
+  if (isNaN(userId)) {
     response.success = false;
-    response.message = "Erro: Usuário Inválido! " ;
+    response.message = "Erro: Usuário Inválido! ";
     response.data = null;
     res.status(200).send(response);
   }
@@ -127,11 +127,11 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
 
   //procura se produto com código igual existe
   let usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: req.body.data.usuarioId } })
-  let produto: ProdutoEntity | null = await AppDataSource.createQueryBuilder().select("produto").from(ProdutoEntity,"produto")
-  .where("produto.codigo = :cod",{cod: req.body.data.codigo}).andWhere("produto.usuarioId = :id",{id: usuario?.Id}).getOne();
+  let produto: ProdutoEntity | null = await AppDataSource.createQueryBuilder().select("produto").from(ProdutoEntity, "produto")
+    .where("produto.codigo = :cod", { cod: req.body.data.codigo }).andWhere("produto.usuarioId = :id", { id: usuario?.Id }).getOne();
 
 
-  
+
   // //req.body.data.codigousuario
   if (produto?.Id) {
 
@@ -154,8 +154,8 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
     ProdutoAdd.fornecedorId = req.body.data.fornecedorId;
     ProdutoAdd.preco = req.body.data.preco;
     ProdutoAdd.usuario = usuario;
-      
-        const response = await AppDataSource.manager.save(ProdutoAdd);
+
+    const response = await AppDataSource.manager.save(ProdutoAdd);
 
     if (response) {
 
@@ -187,63 +187,108 @@ router.post("/cadastrar", async (req: Request, res: Response) => {
 
 router.post("/cadastrar-lista", async (req: Request, res: Response) => {
 
-  const ProdutoAdd = new ProdutoEntity();
+  let ProdutoAdd = new ProdutoEntity();
   let retorno: ResponseModel = new ResponseModel;
-  console.log(req.body.data);
 
-  
-  const dados:any[] = req.body.data;
+
+
+  const dados: any[] = req.body.data;
+  let dataToInsert: ProdutoEntity[] = [];
 
   const usuarioId = dados[0].usuarioId;
 
-  let usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: usuarioId } })
+  const usuario = await AppDataSource.manager.findOne(UsuarioEntity, { where: { Id: usuarioId } });
 
-  for await (const prod of dados) {
-    
-    let produto: ProdutoEntity | null = await AppDataSource.createQueryBuilder().select("produto").from(ProdutoEntity,"produto")
-    .where("produto.codigo = :cod",{cod: prod.codigo}).andWhere("produto.usuarioId = :id",{id: usuarioId}).getOne();
-  
-  
-    
-    // //req.body.data.codigousuario
-    if (produto?.Id) {
-  
-      retorno.message = "Código de produto já Cadastrado!!!";
-      retorno.success = false;
-      res.status(200).send(retorno);
-      return;
-  
-    }
-  
-    try {
-      ProdutoAdd.codigo = prod.codigo;
-      ProdutoAdd.descricao = prod.descricao;
-      ProdutoAdd.tamanho = prod.tamanho;
-      ProdutoAdd.genero = prod.genero;
-      ProdutoAdd.marca = prod.marca;
-      ProdutoAdd.cor = prod.cor;
-      ProdutoAdd.estoque = prod.estoque;
-      ProdutoAdd.estoqueTotal = prod.estoqueTotal;
-      ProdutoAdd.fornecedorId = prod.fornecedorId;
-      ProdutoAdd.preco = prod.preco;
+
+  let produtos = await AppDataSource.manager.find(ProdutoEntity, { where: { usuario: usuario as UsuarioEntity } })
+
+
+  new Promise<void>(async (resolve, reject) => {
+
+    dados.map((data) => {
+      let prodFound = produtos.find((prod) => prod.Id === data.codigo);
+
+      if (prodFound?.Id) {
+        retorno.message = "Código de produto já Cadastrado!!!";
+        retorno.success = false;
+        res.status(200).send(retorno);
+        return;
+      }
+
+      ProdutoAdd = new ProdutoEntity();
+      ProdutoAdd.codigo = data.codigo;
+      ProdutoAdd.descricao = data.descricao;
+      ProdutoAdd.tamanho = data.tamanho;
+      ProdutoAdd.genero = data.genero;
+      ProdutoAdd.marca = data.marca;
+      ProdutoAdd.cor = data.cor;
+      ProdutoAdd.estoque = data.estoque;
+      ProdutoAdd.estoqueTotal = data.estoqueTotal;
+      ProdutoAdd.fornecedorId = data.fornecedorId;
+      ProdutoAdd.preco = data.preco;
       ProdutoAdd.usuario = usuario;
-        
-          const response = await AppDataSource.manager.save(ProdutoAdd);
-  
-    
-    } catch (error) {
-      res.status(200).send(error);
-      return;
+
+      dataToInsert.push(ProdutoAdd);
+    })
+
+    const resposta = await AppDataSource.manager.createQueryBuilder().insert().into(ProdutoEntity).values(dataToInsert).execute();
+
+    if (resposta.raw != null) {
+      resolve();
     }
 
-  }
+    // for await (const prod of dados) {
 
+
+
+
+
+
+
+    //   // //req.body.data.codigousuario
+    //   if (produto?.Id) {
+
+    //     retorno.message = "Código de produto já Cadastrado!!!";
+    //     retorno.success = false;
+    //     res.status(200).send(retorno);
+    //     return;
+
+    //   }
+
+    //   // console.log("passei aqui com esse valor");
+    //   // console.log(prod);
+
+    //   ProdutoAdd.codigo = prod.codigo;
+    //   ProdutoAdd.descricao = prod.descricao;
+    //   ProdutoAdd.tamanho = prod.tamanho;
+    //   ProdutoAdd.genero = prod.genero;
+    //   ProdutoAdd.marca = prod.marca;
+    //   ProdutoAdd.cor = prod.cor;
+    //   ProdutoAdd.estoque = prod.estoque;
+    //   ProdutoAdd.estoqueTotal = prod.estoqueTotal;
+    //   ProdutoAdd.fornecedorId = prod.fornecedorId;
+    //   ProdutoAdd.preco = prod.preco;
+    //   ProdutoAdd.usuario = usuario;
+
+    //   // console.log(ProdutoAdd)
+
+    //   // await AppDataSource.manager.save(ProdutoAdd);
+
+    //   await AppDataSource.manager.createQueryBuilder().insert().into(ProdutoEntity).values(dados)
+
+
+    // }
+
+
+  }).then(()=>{
     retorno.success = true;
     retorno.data = response;
     retorno.message = "Produto Cadastrado com sucessso!"
     res.status(200).send(retorno);
-    return
+    return;
+  });
 
+  
 });
 
 router.delete("/", async (req: Request, res: Response) => {
