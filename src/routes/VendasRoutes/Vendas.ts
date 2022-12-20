@@ -35,19 +35,21 @@ router.post("/listar", async (req: Request, res: Response) => {
     const clientes = await AppDataSource.manager.find(ClienteEntity, { where: { usuario: user as UsuarioEntity } });
 
     
-    const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("*").from(VendaEntity,"venda").where(' venda.usuarioId = :id',{ id: userId }).execute();
+    const QueryResponse = await AppDataSource.manager.createQueryBuilder().select("venda.Id as vendaId,venda.*,cliente.*").from(VendaEntity,"venda").innerJoin(ClienteEntity,"cliente","cliente.Id = venda.clienteId ").where(' venda.usuarioId = :id',{ id: userId }).execute();
+  
   
 
     const dataToReturn: any[] = [];
  
     for await (const venda of QueryResponse) {
-      let ThisVendaClient = clientes.find((x) => x.Id === venda.clienteId);
+  
 
-      
-        dataToReturn.push({ ...venda, "cliente": ThisVendaClient });
+      venda.Id = venda.vendaid;
+        dataToReturn.push({ ...venda, "clienteDesc": venda.nome });
     } 
  
- 
+  
+
     response.success = true;
     response.message = "Listado!"; 
     response.data = dataToReturn;
@@ -57,7 +59,7 @@ router.post("/listar", async (req: Request, res: Response) => {
     response.success = false;
     response.message = "Erro: " + error;
     response.data = null;
-    console.log(response);
+    // console.log(response);
     res.status(200).send(response);
     return;
   }
@@ -227,6 +229,7 @@ router.delete("/deleteporLista", async (req: Request, res: Response) => {
   let listaids: number[] = req.body.listaids;
   let retorno: ResponseModel = new ResponseModel();
 
+    console.log(req.body);
   try {
     const response = await AppDataSource.manager.delete(VendaEntity, {
       Id: In(listaids),
